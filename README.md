@@ -13,7 +13,7 @@ Uses **Kokoro ONNX** on CPU (leaving your GPU free for other workloads) and stre
   - **When reading:** Immediately aborts playback and stops synthesis.
 - **Zero GPU usage:** Runs on CPU via `onnxruntime`.
 - **No leftover audio files:** Audio is streamed in memory through `sounddevice`.
-- **Configurable defaults:** `1.3x` speech speed, `af_heart` voice, customizable hotkeys.
+- **Configurable defaults:** `1.4x` speech speed, `af_heart` voice, customizable hotkeys.
 
 ---
 
@@ -70,7 +70,7 @@ You can pass any CLI flag through `start_talktalk.ps1`:
 
 | Flag | Default | Description |
 | :--- | :--- | :--- |
-| `--speed` | `1.3` | Speech speed multiplier |
+| `--speed` | `1.4` | Speech speed multiplier |
 | `--voice` | `af_heart` | Kokoro voice name |
 | `--lang` | `en-us` | Kokoro language code |
 | `--read-hotkey` | `<ctrl>+<shift>+<space>` | Global hotkey to start reading |

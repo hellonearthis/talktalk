@@ -53,7 +53,7 @@ class KokoroTTSEngine:
     def __init__(
         self,
         voice: str = "af_heart",
-        speed: float = 1.3,
+        speed: float = 1.4,
         lang: str = "en-us",
     ) -> None:
         from kokoro_onnx import Kokoro
@@ -144,7 +144,7 @@ def create_tts_engine(
     engine_name: str,
     *,
     voice: str = "af_heart",
-    speed: float = 1.3,
+    speed: float = 1.4,
     lang: str = "en-us",
     device: str = "CPU",
     language: str = "English",

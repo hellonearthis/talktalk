@@ -32,8 +32,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--speed",
         type=float,
-        default=1.3,
-        help="Kokoro speech speed multiplier (default: 1.3).",
+        default=1.4,
+        help="Kokoro speech speed multiplier (default: 1.4).",
     )
     parser.add_argument(
         "--lang",
