@@ -6,6 +6,7 @@ import os
 import sys
 import threading
 import time
+import winreg
 
 import pyperclip
 import pystray
@@ -21,6 +22,8 @@ MODEL_DIR = os.path.join(APP_DIR, "models", "kokoro")
 LOG_PATH = os.path.join(APP_DIR, "talktalk.log")
 HOTKEY = "<ctrl>+<shift>+<space>"
 DEFAULT_SPEED = 1.3
+RUN_KEY_PATH = r"Software\Microsoft\Windows\CurrentVersion\Run"
+RUN_VALUE_NAME = "TalkTalk"
 
 
 def build_icon_image() -> Image.Image:
@@ -40,6 +43,30 @@ def redirect_output_to_log() -> None:
     log_file = open(LOG_PATH, "a", buffering=1, encoding="utf-8")
     sys.stdout = log_file
     sys.stderr = log_file
+
+
+def is_autostart_enabled() -> bool:
+    """Return True if TalkTalk is registered in the per-user Windows Run key."""
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY_PATH) as run_key:
+            winreg.QueryValueEx(run_key, RUN_VALUE_NAME)
+            return True
+    except FileNotFoundError:
+        return False
+
+
+def set_autostart(enabled: bool) -> None:
+    """Add or remove the Run-key entry that launches the exe at login."""
+    with winreg.OpenKey(
+        winreg.HKEY_CURRENT_USER, RUN_KEY_PATH, 0, winreg.KEY_SET_VALUE
+    ) as run_key:
+        if enabled:
+            winreg.SetValueEx(run_key, RUN_VALUE_NAME, 0, winreg.REG_SZ, f'"{sys.executable}"')
+        else:
+            try:
+                winreg.DeleteValue(run_key, RUN_VALUE_NAME)
+            except FileNotFoundError:
+                pass
 
 
 def main() -> None:
@@ -77,8 +104,17 @@ def main() -> None:
     def on_open_log(_icon: pystray.Icon, _item: pystray.MenuItem) -> None:
         os.startfile(APP_DIR)
 
+    def on_toggle_autostart(_icon: pystray.Icon, _item: pystray.MenuItem) -> None:
+        set_autostart(not is_autostart_enabled())
+
     menu = pystray.Menu(
         pystray.MenuItem(f"TalkTalk ({HOTKEY})", None, enabled=False),
+        pystray.MenuItem(
+            "Start with Windows",
+            on_toggle_autostart,
+            checked=lambda _item: is_autostart_enabled(),
+            visible=getattr(sys, "frozen", False),
+        ),
         pystray.MenuItem("Open log folder", on_open_log),
         pystray.MenuItem("Quit", on_quit),
     )

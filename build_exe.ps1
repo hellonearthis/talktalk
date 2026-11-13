@@ -20,3 +20,17 @@ $python = Join-Path $PSScriptRoot ".venv\Scripts\python.exe"
 
 Write-Host "Built: dist\TalkTalk\TalkTalk.exe"
 
+# Optional: build the installer if Inno Setup is installed
+$iscc = @(
+    "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe",
+    "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+    "$env:ProgramFiles\Inno Setup 6\ISCC.exe"
+) | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+if ($iscc) {
+    & $iscc talktalk.iss
+    Write-Host "Built: installer\TalkTalk-Setup.exe"
+} else {
+    Write-Host "Inno Setup not found; skipped installer (winget install JRSoftware.InnoSetup)."
+}
+

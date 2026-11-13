@@ -61,7 +61,9 @@ The script version above keeps working as-is. To also build a windowless tray ap
 .\build_exe.ps1
 ```
 
-This produces `dist\TalkTalk\TalkTalk.exe` (a folder build; keep the whole `TalkTalk` folder together). It runs from the system tray with a **Quit** menu, uses `Ctrl+Shift+Space` at `1.3x`, stores models in `%LOCALAPPDATA%\TalkTalk\models\kokoro` (downloaded on first launch), and logs to `%LOCALAPPDATA%\TalkTalk\talktalk.log`.
+This produces `dist\TalkTalk\TalkTalk.exe` (a folder build; keep the whole `TalkTalk` folder together) and, if [Inno Setup](https://jrsoftware.org/isinfo.php) is installed (`winget install JRSoftware.InnoSetup`), an installer at `installer\TalkTalk-Setup.exe` (per-user install, no admin needed, optional "Start with Windows" and desktop shortcut).
+
+The tray app runs `Ctrl+Shift+Space` at `1.3x`. Right-click the tray icon for **Start with Windows** (toggle), **Open log folder** and **Quit**. Models are stored in `%LOCALAPPDATA%\TalkTalk\models\kokoro` (downloaded on first launch), and the log is `%LOCALAPPDATA%\TalkTalk\talktalk.log`.
 
 The pre-exe script version is also tagged `script-v1`.
 
