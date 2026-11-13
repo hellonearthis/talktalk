@@ -43,7 +43,9 @@ def _ensure_kokoro_files(model_dir: str = KOKORO_MODEL_DIR) -> tuple[str, str]:
     for url, path in ((KOKORO_MODEL_URL, model_path), (KOKORO_VOICES_URL, voices_path)):
         if not os.path.isfile(path):
             print(f"Downloading {os.path.basename(path)}...")
-            urllib.request.urlretrieve(url, path)
+            partial_path = f"{path}.part"
+            urllib.request.urlretrieve(url, partial_path)
+            os.replace(partial_path, path)
     return model_path, voices_path
 
 
@@ -55,10 +57,11 @@ class KokoroTTSEngine:
         voice: str = "af_heart",
         speed: float = 1.3,
         lang: str = "en-us",
+        model_dir: str = KOKORO_MODEL_DIR,
     ) -> None:
         from kokoro_onnx import Kokoro
 
-        model_path, voices_path = _ensure_kokoro_files()
+        model_path, voices_path = _ensure_kokoro_files(model_dir)
         self._kokoro = Kokoro(model_path, voices_path)
         self._voice = voice
         self._speed = speed

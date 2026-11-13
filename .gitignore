@@ -3,3 +3,8 @@ __pycache__/
 *.py[cod]
 models/
 ov_cache/
+
+dist/
+build/
+*.spec
+talktalk.ico
