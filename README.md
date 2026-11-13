@@ -63,7 +63,9 @@ The script version above keeps working as-is. To also build a windowless tray ap
 
 This produces `dist\TalkTalk\TalkTalk.exe` (a folder build; keep the whole `TalkTalk` folder together) and, if [Inno Setup](https://jrsoftware.org/isinfo.php) is installed (`winget install JRSoftware.InnoSetup`), an installer at `installer\TalkTalk-Setup.exe` (per-user install, no admin needed, optional "Start with Windows" and desktop shortcut).
 
-The tray app runs `Ctrl+Shift+Space` at `1.3x`. Right-click the tray icon for **Speed** (1x, 1.1x, 1.2x, 1.3x, 1.4x, 1.5x, 2x; remembered between launches, applies from the next sentence), **Start with Windows** (toggle), **Open log folder** and **Quit**. Models are stored in `%LOCALAPPDATA%\TalkTalk\models\kokoro` (downloaded on first launch), and the log is `%LOCALAPPDATA%\TalkTalk\talktalk.log`.
+The tray app runs `Ctrl+Shift+Space` at `1.3x`. Right-click the tray icon for **Hotkey** (`Ctrl+Shift+Space` or `Keypad 0`; remembered between launches), **Speed** (1x, 1.1x, 1.2x, 1.3x, 1.4x, 1.5x, 2x; remembered, applies from the next sentence), **Start with Windows** (toggle), **Open log folder** and **Quit**.
+
+Notes on `Keypad 0`: it needs NumLock on, and while selected TalkTalk swallows the key so it won't type a `0`. Switch back to `Ctrl+Shift+Space` if you need the keypad 0 for typing. Models are stored in `%LOCALAPPDATA%\TalkTalk\models\kokoro` (downloaded on first launch), and the log is `%LOCALAPPDATA%\TalkTalk\talktalk.log`.
 
 The pre-exe script version is also tagged `script-v1`.
 
