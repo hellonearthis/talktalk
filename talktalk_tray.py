@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 import threading
@@ -20,10 +21,32 @@ from tts_engines import KokoroTTSEngine
 APP_DIR = os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")), "TalkTalk")
 MODEL_DIR = os.path.join(APP_DIR, "models", "kokoro")
 LOG_PATH = os.path.join(APP_DIR, "talktalk.log")
+SETTINGS_PATH = os.path.join(APP_DIR, "settings.json")
 HOTKEY = "<ctrl>+<shift>+<space>"
 DEFAULT_SPEED = 1.3
+SPEED_CHOICES = (1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 2.0)
 RUN_KEY_PATH = r"Software\Microsoft\Windows\CurrentVersion\Run"
 RUN_VALUE_NAME = "TalkTalk"
+
+
+def load_saved_speed() -> float:
+    """Return the speed saved by the tray menu, or the default if missing/invalid."""
+    try:
+        with open(SETTINGS_PATH, encoding="utf-8") as settings_file:
+            saved_speed = float(json.load(settings_file)["speed"])
+    except (OSError, ValueError, KeyError, TypeError):
+        return DEFAULT_SPEED
+    return saved_speed if saved_speed in SPEED_CHOICES else DEFAULT_SPEED
+
+
+def save_speed(speed: float) -> None:
+    os.makedirs(APP_DIR, exist_ok=True)
+    with open(SETTINGS_PATH, "w", encoding="utf-8") as settings_file:
+        json.dump({"speed": speed}, settings_file)
+
+
+def format_speed_label(speed: float) -> str:
+    return f"{speed:g}x"
 
 
 def build_icon_image() -> Image.Image:
@@ -73,7 +96,7 @@ def main() -> None:
     redirect_output_to_log()
     print(f"\n--- TalkTalk started {time.strftime('%Y-%m-%d %H:%M:%S')} ---")
 
-    engine = KokoroTTSEngine(speed=DEFAULT_SPEED, model_dir=MODEL_DIR)
+    engine = KokoroTTSEngine(speed=load_saved_speed(), model_dir=MODEL_DIR)
     player = StreamingTTSPlayer(engine)
     key_controller = keyboard.Controller()
 
@@ -107,8 +130,24 @@ def main() -> None:
     def on_toggle_autostart(_icon: pystray.Icon, _item: pystray.MenuItem) -> None:
         set_autostart(not is_autostart_enabled())
 
+    def make_speed_item(speed_choice: float) -> pystray.MenuItem:
+        def on_select(_icon: pystray.Icon, _item: pystray.MenuItem) -> None:
+            engine.speed = speed_choice
+            save_speed(speed_choice)
+            print(f"[Speed] {speed_choice}")
+
+        return pystray.MenuItem(
+            format_speed_label(speed_choice),
+            on_select,
+            checked=lambda _item: engine.speed == speed_choice,
+            radio=True,
+        )
+
+    speed_menu = pystray.Menu(*(make_speed_item(choice) for choice in SPEED_CHOICES))
+
     menu = pystray.Menu(
         pystray.MenuItem(f"TalkTalk ({HOTKEY})", None, enabled=False),
+        pystray.MenuItem("Speed", speed_menu),
         pystray.MenuItem(
             "Start with Windows",
             on_toggle_autostart,

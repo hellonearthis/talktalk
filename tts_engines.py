@@ -64,11 +64,11 @@ class KokoroTTSEngine:
         model_path, voices_path = _ensure_kokoro_files(model_dir)
         self._kokoro = Kokoro(model_path, voices_path)
         self._voice = voice
-        self._speed = speed
+        self.speed = speed  # public so a UI (tray menu) can change it between chunks
         self._lang = lang
         self.sample_rate = 24000
         # Warm up ONNX runtime so first hotkey press is fast
-        self._kokoro.create("Ready.", voice=self._voice, speed=self._speed, lang=self._lang)
+        self._kokoro.create("Ready.", voice=self._voice, speed=self.speed, lang=self._lang)
 
     def stream_chunks(
         self,
@@ -81,7 +81,7 @@ class KokoroTTSEngine:
             samples, sr = self._kokoro.create(
                 segment,
                 voice=self._voice,
-                speed=self._speed,
+                speed=self.speed,
                 lang=self._lang,
             )
             self.sample_rate = sr
