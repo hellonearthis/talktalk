@@ -7,16 +7,24 @@ $python = Join-Path $PSScriptRoot ".venv\Scripts\python.exe"
 
 & $python -c "from talktalk_tray import build_icon_image; build_icon_image().save('talktalk.ico', sizes=[(16,16),(32,32),(48,48),(64,64)])"
 
+$espeakData = Join-Path $PSScriptRoot ".venv\Lib\site-packages\espeakng_loader\espeak-ng-data"
+
 & $python -m PyInstaller --noconfirm --clean --onedir --windowed `
     --name TalkTalk `
     --icon talktalk.ico `
     --collect-all kokoro_onnx `
     --collect-all espeakng_loader `
+    --add-data "${espeakData};espeakng_loader/espeak-ng-data" `
     --collect-all onnxruntime `
     --collect-binaries sounddevice `
     --exclude-module babelvox `
     --exclude-module openvino `
     talktalk_tray.py
+
+if (-not (Test-Path "dist\TalkTalk\_internal\espeakng_loader\espeak-ng-data")) {
+    Write-Error "Build is missing espeak-ng-data; the exe would fail at startup."
+    exit 1
+}
 
 Write-Host "Built: dist\TalkTalk\TalkTalk.exe"
 
